@@ -24,6 +24,16 @@ The `--generate` mode requires an **already-running local Ollama** instance and
 an installed model. The model may hallucinate, ignore evidence, or cite sources
 incorrectly; always inspect its answer alongside the retrieved passages.
 
+## Algorithm implementation
+
+The BM25 retriever now builds an **inverted index from scratch**, computes
+document frequencies and cached length normalization, and scores only matching
+posting lists. BM25Index.explain() reports individual query-term contributions.
+A separate reference implementation in the tests verifies rankings and scores.
+
+Read [the implementation walkthrough](docs/implementation.md) for the exact
+BM25 equation, index structure, and example evaluation.
+
 ## Process
 
 ```text
