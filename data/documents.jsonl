@@ -1,0 +1,7 @@
+{"id":"git-commit","title":"Git commit","text":"The git commit command records staged changes as a new version in the local Git repository history. Use git add before git commit.","source":"synthetic://git-commit"}
+{"id":"git-clone","title":"Git clone","text":"The git clone command downloads an existing remote repository and its commit history to your computer.","source":"synthetic://git-clone"}
+{"id":"git-branch","title":"Git branch and merge","text":"Git branches let developers work on separate lines of development. Merge integrates changes from one branch into another branch.","source":"synthetic://git-branch"}
+{"id":"pull-request","title":"GitHub pull requests","text":"A pull request on GitHub proposes a set of commits to merge. Reviewers can discuss changes, inspect code, request fixes, and approve the contribution.","source":"synthetic://pull-request"}
+{"id":"linux-cd","title":"Linux cd command","text":"The Linux shell uses cd to change the current working directory. The pwd command prints your current directory, and ls lists files.","source":"synthetic://linux-cd"}
+{"id":"linux-chmod","title":"Linux permissions","text":"The chmod command changes file mode permissions in Linux, such as allowing the owner to execute a script.","source":"synthetic://linux-chmod"}
+{"id":"github-actions","title":"GitHub Actions","text":"GitHub Actions runs workflows defined as YAML files in .github/workflows. CI can build, test and check contributions.","source":"synthetic://github-actions"}
