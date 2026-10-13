@@ -2,9 +2,7 @@
 
 [![Tests](https://github.com/VMatee/rag-from-scratch/actions/workflows/tests.yml/badge.svg)](https://github.com/VMatee/rag-from-scratch/actions/workflows/tests.yml)
 
-Build the **retrieval** and **context assembly** parts of Retrieval-Augmented
-Generation (RAG) with just the Python standard library. Learn tokenization,
-BM25 lexical ranking, top-k evidence selection and source tracking.
+This repository implements **document retrieval and evidence assembly** using a hand-written inverted index and the BM25 ranking algorithm. All retrieval logic uses Python's standard library, including tokenization, scoring, top-k ranking, and source tracking.
 
 An optional local Ollama HTTP backend handles generation; we do **not** claim
 to implement or train an LLM here. The default mode prints retrieved evidence
@@ -23,6 +21,22 @@ python -m rag_lab.evaluate
 The `--generate` mode requires an **already-running local Ollama** instance and
 an installed model. The model may hallucinate, ignore evidence, or cite sources
 incorrectly; always inspect its answer alongside the retrieved passages.
+
+## Mathematical model
+
+For a query $q$ and a document $d$, the code ranks documents by BM25:
+
+$
+\mathrm{BM25}(q,d)
+=\sum_{t\in\mathrm{unique}(q)}
+\mathrm{IDF}(t)
+\frac{\mathrm{tf}(t,d)(k_1+1)}
+{\mathrm{tf}(t,d)+k_1(1-b+b|d|/\overline{L})}.
+$
+
+The mathematical guide derives every term, works through a numeric scoring example, explains the inverted index, and shows how to evaluate retrieval without conflating it with generation.
+
+**[Read the complete BM25 and evidence derivation →](docs/mathematics.md)**
 
 ## Algorithm implementation
 
@@ -60,7 +74,7 @@ Key files: `src/rag_lab/bm25.py`, `src/rag_lab/pipeline.py`,
 **Reading:** Robertson & Zaragoza (2009), *The Probabilistic Relevance Framework: BM25 and Beyond*;
 Lewis et al. (2020), *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks*.
 
-## Interactive notebook
+## Reproducible notebook
 
 Open [the step-by-step notebook](notebooks/01_walkthrough.ipynb) in Jupyter after installing this repository with `python -m pip install -e ".[dev]"`.
 
