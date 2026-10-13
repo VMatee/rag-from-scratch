@@ -12,17 +12,17 @@ A document contains an ID, title, text and source label. The tokenizer in [bm25.
 
 Let $D=\{d_1,\ldots,d_N\}$ be the collection of indexed documents. Define the term frequency of token $t$ in document $d$ as
 
-$$
+```math
 \mathrm{tf}(t,d)
 =\sum_{w\in d}\mathbf{1}[w=t],
-$$
+```
 
 where $\mathbf{1}[\cdot]$ is 1 when the condition holds and 0 otherwise. The document frequency is different: it counts documents that contain the term at least once,
 
-$$
+```math
 \mathrm{df}(t)
 =\sum_{d\in D}\mathbf{1}[\mathrm{tf}(t,d)>0].
-$$
+```
 
 The code uses Python Counters to build these values. Both document titles and document bodies contribute to the indexed text; the source label is retained for provenance but is not scored as text.
 
@@ -34,24 +34,24 @@ If **git** occurs five times in one document, then $\mathrm{tf}(\text{git},d)=5$
 
 BM25 uses a smoothed inverse document frequency:
 
-$$
+```math
 \boxed{
 \mathrm{IDF}(t)
 =\ln\left(1+\frac{N-\mathrm{df}(t)+0.5}
 {\mathrm{df}(t)+0.5}\right).
 }
-$$
+```
 
 The added 1 keeps the value positive, including for very common terms. The implementation follows this exact equation with **math.log1p**.
 
 Consider a tiny collection of $N=3$ documents. If only one document contains a search term, its document frequency is 1 and
 
-$$
+```math
 \mathrm{IDF}(t)
 =\ln\left(1+\frac{3-1+0.5}{1+0.5}\right)
 =\ln\left(\frac{8}{3}\right)
 \approx0.98083.
-$$
+```
 
 If all three documents contain the term, the IDF is lower. That is intentional: the term provides less power to distinguish documents.
 
@@ -61,20 +61,20 @@ Counting matches alone would favor long documents, because they have more opport
 
 Let $|d|$ be the number of indexed terms in document $d$, and let $\overline{L}$ be the collection's average document length. Define
 
-$$
+```math
 K(d)
 =k_1\left(1-b+b\frac{|d|}{\overline{L}}\right),
-$$
+```
 
 where $k_1>0$ sets term-frequency saturation and $b\in[0,1]$ sets the strength of length normalization. The repository defaults to $k_1=1.5$ and $b=0.75$.
 
 For a term $t$, its contribution to a document's relevance is
 
-$$
+```math
 s(t,d)=\mathrm{IDF}(t)
 \frac{\mathrm{tf}(t,d)(k_1+1)}
 {\mathrm{tf}(t,d)+K(d)}.
-$$
+```
 
 When a word repeats, the numerator grows, but the denominator grows too. The score therefore increases more slowly than a raw term count.
 
@@ -82,18 +82,18 @@ When a word repeats, the numerator grows, but the denominator grows too. The sco
 
 Suppose a document is 100 tokens long, the average length is also 100, a query term occurs twice, and that term has IDF 0.98083. With $k_1=1.5$ and $b=0.75$:
 
-$$
+```math
 K(d)=1.5\left(1-0.75+0.75\frac{100}{100}\right)=1.5.
-$$
+```
 
 The term contributes
 
-$$
+```math
 s(t,d)=0.98083
 \frac{2(1.5+1)}{2+1.5}
 =0.98083\frac{5}{3.5}
 \approx\boxed{1.40118}.
-$$
+```
 
 This is a numerical illustration of the formula, not a score measured from the repository's small example dataset.
 
@@ -101,12 +101,12 @@ This is a numerical illustration of the formula, not a score measured from the r
 
 For a query $q$, the total BM25 score is the sum of the contributions of its *distinct* normalized terms:
 
-$$
+```math
 \boxed{
 \mathrm{BM25}(q,d)
 =\sum_{t\in\mathrm{unique}(q)}s(t,d).
 }
-$$
+```
 
 The word **unique** matters here. This repository converts the query tokens into a set, so writing the same query term twice does not double its contribution. That is an implementation decision, not a universal property of every BM25 variant.
 
@@ -120,18 +120,18 @@ Relevance scoring would be wasteful if the code searched every document for ever
 
 For each vocabulary term $t$, it stores a postings list
 
-$$
+```math
 \mathcal{P}(t)
 =\{(i,\mathrm{tf}(t,d_i)):\mathrm{tf}(t,d_i)>0\}.
-$$
+```
 
 For a query with terms $t_1,\ldots,t_m$, the code reads only the corresponding lists $\mathcal{P}(t_1),\ldots,\mathcal{P}(t_m)$. It accumulates scores by document index and sorts the matched candidates.
 
 The number of term-document pairs inspected for scoring is related to
 
-$$
+```math
 \sum_{t\in\mathrm{unique}(q)}|\mathcal{P}(t)|
-$$
+```
 
 rather than necessarily $N$ full document scans. However, search time still depends on posting-list sizes, sorting, Python overhead and the query distribution. There are no published latency benchmarks in this repository.
 
@@ -143,10 +143,10 @@ A retrieved item is not only a numeric score. It also carries the original docum
 
 Conceptually, the evidence passed downstream is
 
-$$
+```math
 \mathcal{C}(q)
-=\operatorname{concat}\bigl(\mathrm{top}\text{-}k\ \text{documents ranked by BM25}(q,\cdot)\bigr).
-$$
+=\mathrm{concat}\bigl(\mathrm{top}\text{-}k\ \text{documents ranked by BM25}(q,\cdot)\bigr).
+```
 
 This produces *context*, not a generated answer. The default command therefore prints retrieved evidence and makes no claim that a language model has summarized it.
 
@@ -156,12 +156,12 @@ When the optional **--generate** mode is enabled, [ollama.py](../src/rag_lab/oll
 
 The bundled [evaluation](../src/rag_lab/evaluate.py) contains a few handcrafted query/document-ID pairs. For $Q$ evaluation queries, hit-at-$k$ is
 
-$$
+```math
 \mathrm{Hit@}k
 =\frac{1}{Q}
 \sum_{i=1}^{Q}
 \mathbf{1}\left[d_i^\star\in\mathrm{Top}k(q_i)\right],
-$$
+```
 
 where $d_i^\star$ is the expected relevant document for query $q_i$. A score of 1.0 means every expected ID appeared in the top-$k$ for *that small set*—not that the retriever will handle unknown documents or real-world paraphrases.
 

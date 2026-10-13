@@ -26,13 +26,13 @@ incorrectly; always inspect its answer alongside the retrieved passages.
 
 For a query $q$ and a document $d$, the code ranks documents by BM25:
 
-$
+```math
 \mathrm{BM25}(q,d)
 =\sum_{t\in\mathrm{unique}(q)}
 \mathrm{IDF}(t)
 \frac{\mathrm{tf}(t,d)(k_1+1)}
 {\mathrm{tf}(t,d)+k_1(1-b+b|d|/\overline{L})}.
-$
+```
 
 The mathematical guide derives every term, works through a numeric scoring example, explains the inverted index, and shows how to evaluate retrieval without conflating it with generation.
 
